@@ -32,3 +32,8 @@ class GeminiWithMemory:
             return answer
         else:
             raise Exception(f"Erro na API Gemini: {response.text}")
+        
+    def clear_history(self):
+        """Limpa todo o histórico de conversação"""
+        self.history.clear()
+        print("Histórico de memória foi resetado.")

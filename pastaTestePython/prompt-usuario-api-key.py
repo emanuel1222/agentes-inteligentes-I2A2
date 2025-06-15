@@ -12,6 +12,9 @@ sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 # Carrega variáveis do .env
 load_dotenv()
 
+# Inicializar Gemini com memória
+gemini = GeminiWithMemory(api_key=os.getenv("GEMINI_API_KEY")) 
+
 def descompactar_arquivo(zip_path: str, extract_to: str) -> bool:
     if os.path.exists(extract_to) and any(f.endswith('.csv') for f in os.listdir(extract_to)):
         print(f"✓ Pasta '{extract_to}' já contém arquivos CSV. Pulando descompactação.")
@@ -23,7 +26,34 @@ def descompactar_arquivo(zip_path: str, extract_to: str) -> bool:
     print(f"✓ Arquivos descompactados em: {extract_to}")
     return True
 
-
+def analyze_with_fallback(df, question):
+    try:
+        # Configuração para mostrar TODAS as colunas
+        pd.set_option('display.max_columns', None)
+        
+        # Amostra com todas as colunas visíveis
+        sample = df.sample(min(100, len(df)))
+        
+        # Usando to_string() com configuração completa
+        prompt = f"""
+        Dados completos (amostra de {len(sample)} linhas):
+        {sample.to_string(index=False, max_colwidth=20)}
+        
+        Pergunta: {question}
+        """
+        return gemini.generate_content(prompt)
+        
+    except Exception as e:
+        # Fallback com cabeçalho completo
+        cols = "\n".join(df.columns.tolist())
+        return f"""
+        Erro na análise: {str(e)}
+        
+        Cabeçalho completo:
+        {cols}
+        
+        Por favor, refine sua pergunta.
+        """
 
 def main():
     # Configurações
@@ -52,32 +82,40 @@ def main():
         except ValueError:
             print("Digite um número válido.")
     
-    # Inicializar Gemini com memória
-    gemini = GeminiWithMemory(api_key=os.getenv("GEMINI_API_KEY")) 
     loading = LoadingAnimation()
 
     # Loop de interação
     while True:
-        pergunta = input("\nDigite sua pergunta sobre os dados (ou 'sair'): ")
+        pergunta = input(
+            "\n'sair' para fechar o terminal" \
+            "\n'limpar' para limpar o historico " \
+            "\nDigite sua pergunta sobre os dados: "
+        )
         if pergunta.lower() == 'sair':
             break
+
+        if pergunta.lower() == 'limpar': 
+            gemini.clear_history()
+            continue
         
         try:
             loading.start()
-            
+
             # Carrega amostra do CSV para contexto
             df = pd.read_csv(arquivo_selecionado, encoding='utf-8')
-            sample = df.head(5).to_string(index=False)
+            # sample = df.head(5).to_string(index=False)
+
+            resposta = analyze_with_fallback(df, pergunta)
             
             # Combina pergunta + dados CSV
-            prompt_completo = f"""
-            Dados CSV (amostra de 5 linhas):
-            {sample}
+            # prompt_completo = f"""
+            # # Dados CSV (amostra de 5 linhas):
+            # # {sample}
 
-            Pergunta: {pergunta}
-            """
+            # # Pergunta: {pergunta}
+            # # """
             
-            resposta = gemini.generate_content(prompt_completo)
+            # resposta = gemini.generate_content(prompt_completo)
             loading.stop()
             print("\nResposta:\n", resposta)
             
