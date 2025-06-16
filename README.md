@@ -52,3 +52,7 @@ Este projeto permite que você converse com seus dados (de arquivos CSV e Excel)
 
 *   O script tenta criar um `dados.zip` de exemplo se não encontrar o seu, apenas para demonstração.
 *   O modelo Gemini usado é o `"gemini-1.5-flash-preview-05-20"`. Você pode trocar por outros. [Modelos](https://ai.google.dev/gemini-api/docs/models)
+
+## Ref
+
+[Exemplo](https://colab.research.google.com/github/sudarshan-koirala/youtube-stuffs/blob/main/langchain/sql_chain.ipynb#scrollTo=ec47a2bf)

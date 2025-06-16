@@ -2,8 +2,6 @@ import tkinter as tk
 from tkinter import scrolledtext, messagebox
 from main import criar_agente
 import os
-import re
-from langchain.agents import AgentExecutor
 
 class ChatApp:
     def __init__(self, root, db_path):

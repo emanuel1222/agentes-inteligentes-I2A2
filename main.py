@@ -58,14 +58,14 @@ def criar_agente(db_path: str):
     # Usar ChatGoogleGenerativeAI com o modelo Gemini
     
     _CUSTOM_TEMPLATE = """
-    Você é um assistente de dados. Dada uma pergunta, primeiro crie uma query {dialect} correta, depois analise o resultado da query e responda de forma curta, direta e compreensível por humanos.
+    Você é um assistente de dados. Dada uma pergunta, primeiro crie uma query {dialect} correta, depois analise o resultado da query e responda, direta e compreensível por humanos.
 
     Use o seguinte formato:
 
     Pergunta: "Aqui vai a pergunta"
     SQLQuery: "Consulta SQL"
     SQLResult: "Resultado da consulta"
-    Resposta: "Resposta final aqui, de forma natural e objetiva"
+    Resposta: "Resposta final aqui, de forma natural"
 
     Apenas use as tabelas abaixo:
 
