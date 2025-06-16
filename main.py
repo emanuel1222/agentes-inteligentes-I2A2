@@ -3,9 +3,10 @@ import zipfile
 import pandas as pd
 from sqlalchemy import create_engine
 
-from langchain_google_genai import ChatGoogleGenerativeAI # Alterado
-from langchain_experimental.sql import SQLDatabaseChain # Mantido para compatibilidade, mas veja nota abaixo
+from langchain_google_genai import ChatGoogleGenerativeAI 
+from langchain_experimental.sql import SQLDatabaseChain 
 from langchain.sql_database import SQLDatabase
+from langchain.prompts.prompt import PromptTemplate
 
 from dotenv import load_dotenv
 
@@ -55,11 +56,34 @@ def extract_zip_to_sqlite(zip_path: str, db_path: str):
 
 def criar_agente(db_path: str):
     # Usar ChatGoogleGenerativeAI com o modelo Gemini
+    
+    _CUSTOM_TEMPLATE = """
+    Você é um assistente de dados. Dada uma pergunta, primeiro crie uma query {dialect} correta, depois analise o resultado da query e responda de forma curta, direta e compreensível por humanos.
+
+    Use o seguinte formato:
+
+    Pergunta: "Aqui vai a pergunta"
+    SQLQuery: "Consulta SQL"
+    SQLResult: "Resultado da consulta"
+    Resposta: "Resposta final aqui, de forma natural e objetiva"
+
+    Apenas use as tabelas abaixo:
+
+    {table_info}
+
+    Pergunta: {input}
+    """
+
+    CUSTOM_PROMPT = PromptTemplate(
+    input_variables=["input", "table_info", "dialect"],
+    template=_CUSTOM_TEMPLATE
+    )
+    
     llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-preview-05-20", temperature=0) 
 
     db = SQLDatabase.from_uri(f"sqlite:///{db_path}")
 
-    db_chain = SQLDatabaseChain.from_llm(llm, db, verbose=True)
+    db_chain = SQLDatabaseChain.from_llm(llm, db, prompt=CUSTOM_PROMPT, verbose=True)
 
     return db_chain
 
@@ -77,50 +101,12 @@ def perguntar(db_chain, pergunta: str):
 
 if __name__ == "__main__":
     zip_path = "data/202401_NFs.zip"
-    db_path = "sqlite/i2a2.db" 
-    
-    db_dir = os.path.dirname(db_path) # Isso retornará "sqlite"
+    db_path = "sqlite/i2a2.db"
 
-    # Cria o diretório se ele não existir
-    if db_dir and not os.path.exists(db_dir): # Verifica se db_dir não é vazio antes de criar
-        os.makedirs(db_dir)
-        print(f"Diretório '{db_dir}' criado.")
+    os.makedirs(os.path.dirname(db_path), exist_ok=True)
 
     if not os.path.exists(zip_path):
-        print(f"Arquivo {zip_path} não encontrado. Crie um arquivo zip com seus dados.")
-        # Criando um dados.zip de exemplo para o código rodar
-        print("Criando um dados.zip de exemplo com vendas.csv...")
-        example_csv_content = "id,produto,valor\n1,caneta,10\n2,caderno,25\n3,caneta,12"
-        with open("vendas.csv", "w") as f:
-            f.write(example_csv_content)
-        with zipfile.ZipFile(zip_path, 'w') as zf:
-            zf.write("vendas.csv")
-        os.remove("vendas.csv") # Limpa o CSV após zipar
-        print(f"'{zip_path}' de exemplo criado. Você pode substituí-lo pelo seu arquivo real.")
-
+        print(f"Arquivo {zip_path} não encontrado.")
+        exit()
 
     extract_zip_to_sqlite(zip_path, db_path)
-
-    # Etapa 2: Criar agente
-    agente = criar_agente(db_path)
-
-    # Etapa 3: Perguntar
-    pergunta = "Quantas tabelas existem no meu banco e qual o nome delas?"
-    resposta = perguntar(agente, pergunta)
-    print(f"\nPergunta: {pergunta}")
-    print(f"Resposta: {resposta}")
-
-    pergunta_2 = "Qual o valor da chave de acesso 53240150506565000113550010000000191368001919 ?"
-    resposta_2 = perguntar(agente, pergunta_2)
-    print(f"\nPergunta: {pergunta_2}")
-    print(f"Resposta: {resposta_2}")
-
-    pergunta_3 = "Quantos notas foram emitidas da serie '1' ?"
-    resposta_3 = perguntar(agente, pergunta_3)
-    print(f"\nPergunta: {pergunta_3}")
-    print(f"Resposta: {resposta_3}")
-    
-    pergunta_4 = "Quantos foram notas foram emitidas em cada estado?"
-    resposta_4 = perguntar(agente, pergunta_4)
-    print(f"\nPergunta: {pergunta_4}")
-    print(f"Resposta: {resposta_4}")
