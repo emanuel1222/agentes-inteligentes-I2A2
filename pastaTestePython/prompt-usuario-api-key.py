@@ -26,13 +26,13 @@ def descompactar_arquivo(zip_path: str, extract_to: str) -> bool:
     print(f"✓ Arquivos descompactados em: {extract_to}")
     return True
 
-def analyze_with_fallback(df, question):
+def analyze_with_fallback(df, question: str):
     try:
         # Configuração para mostrar TODAS as colunas
         pd.set_option('display.max_columns', None)
         
         # Amostra com todas as colunas visíveis
-        sample = df.sample(min(100, len(df)))
+        sample = df.sample(min(1000, len(df)))
         
         # Usando to_string() com configuração completa
         prompt = f"""
@@ -101,21 +101,10 @@ def main():
         try:
             loading.start()
 
-            # Carrega amostra do CSV para contexto
             df = pd.read_csv(arquivo_selecionado, encoding='utf-8')
-            # sample = df.head(5).to_string(index=False)
 
             resposta = analyze_with_fallback(df, pergunta)
             
-            # Combina pergunta + dados CSV
-            # prompt_completo = f"""
-            # # Dados CSV (amostra de 5 linhas):
-            # # {sample}
-
-            # # Pergunta: {pergunta}
-            # # """
-            
-            # resposta = gemini.generate_content(prompt_completo)
             loading.stop()
             print("\nResposta:\n", resposta)
             

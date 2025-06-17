@@ -2,11 +2,28 @@ import requests
 import json
 
 class GeminiWithMemory:
-    def __init__(self, api_key: str, model: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: str, model: str = "gemini-2.0-flash"):
         self.api_key = api_key
         self.model = model
         self.history = []
         self.base_url = f"https://generativelanguage.googleapis.com/v1beta/models/{self.model}:generateContent"
+        self._setup_analyst_context()
+
+    def _setup_analyst_context(self):
+        """Contexto permanente do analista de planilhas"""
+        self.system_context = {
+            "role": "system",
+            "parts": [{
+                "text": """Você é um analista especializado em Excel/CSVs com regras estritas:
+                1. Para valores específicos: informe linha/coluna exatas
+                2. Para 'primeiro/último': SEMPRE verifique todo o dataset
+                3. Formato de resposta:
+                   📍 Localização: (Linha X, Coluna Y)
+                   🔍 Valor: [dado exato]
+                   📊 Análise: [contexto]
+                   ⚠️ Limitações: [avisos]"""
+            }]
+        }
 
     def generate_content(self, prompt: str) -> str:
         # Adiciona contexto do histórico (últimas 3 interações)
