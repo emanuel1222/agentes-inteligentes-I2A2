@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 load_dotenv() 
 api_key = os.getenv("GOOGLE_API_KEY")
 
-
 def extract_zip_to_sqlite(zip_path: str, db_path: str):
     # Cria conexão com SQLite
     engine = create_engine(f'sqlite:///{db_path}')
@@ -58,7 +57,7 @@ def criar_agente(db_path: str):
     # Usar ChatGoogleGenerativeAI com o modelo Gemini
     
     _CUSTOM_TEMPLATE = """
-    Você é um assistente de dados. Dada uma pergunta, primeiro crie uma query {dialect} correta, depois analise o resultado da query e responda, direta e compreensível por humanos.
+    Você é um assistente de dados. Dada uma pergunta, primeiro crie uma query {dialect} correta, depois analise o resultado da query e SEMPRE responda de forma direta e compreensível por humanos.
 
     Use o seguinte formato:
 
@@ -79,25 +78,13 @@ def criar_agente(db_path: str):
     template=_CUSTOM_TEMPLATE
     )
     
-    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-preview-05-20", temperature=0) 
+    llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash-lite-preview-06-17", temperature=0) 
 
     db = SQLDatabase.from_uri(f"sqlite:///{db_path}")
 
     db_chain = SQLDatabaseChain.from_llm(llm, db, prompt=CUSTOM_PROMPT, verbose=True)
 
     return db_chain
-
-def perguntar(db_chain, pergunta: str):
-    try:
-        resposta = db_chain.run(pergunta)
-        return resposta
-    except Exception as e:
-        print(f"Erro ao executar a pergunta: {e}")
-        # Tentar obter mais detalhes se for um erro de SQL gerado pelo LLM
-        if "SQL:" in str(e) and "Error:" in str(e):
-            print("Possívelmente o LLM gerou um SQL inválido.")
-        return "Desculpe, não consegui processar sua pergunta devido a um erro."
-
 
 if __name__ == "__main__":
     zip_path = "data/202401_NFs.zip"

@@ -33,19 +33,18 @@ Este projeto permite que você converse com seus dados (de arquivos CSV e Excel)
     *   (Não envie este arquivo para o Git! Adicione `.env` ao seu `.gitignore`.)
 
 3.  **Seus Dados:**
-    *   Coloque seus arquivos `.csv` e `.xlsx` dentro de um arquivo ZIP (ex: `data/meus_dados.zip`).
+    *   Coloque seus arquivos `.csv` ou `.xlsx` dentro de um arquivo ZIP.
     *   No script Python, ajuste `zip_path` para o caminho do seu ZIP.
 
 4.  **Rode o Script:**
     ```bash
-    python seu_script.py
+    python chat_gui.py
     ```
 
 ## O Que o Script Faz
 
 *   **`extract_zip_to_sqlite`:** Lê o ZIP e cria o banco de dados SQLite.
 *   **`criar_agente`:** Prepara o "cérebro" (Gemini + LangChain) para conversar com o banco.
-*   **`perguntar`:** Envia sua pergunta para o agente e recebe a resposta.
 *   A parte final do script (`if __name__ == "__main__":`) executa tudo e faz algumas perguntas de exemplo.
 
 ## Importante
