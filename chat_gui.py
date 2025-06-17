@@ -1,6 +1,6 @@
 import tkinter as tk
 from tkinter import scrolledtext, messagebox
-from main import criar_agente
+from db_agent import criar_agente
 import os
 
 class ChatApp:
