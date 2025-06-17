@@ -1,0 +1,591 @@
+{
+  "name": "Agentes Autônomos – Análise de NFes em CSV",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "initialMessages": "Oi! 👋\nSomos o grupo Agentes de Turing, como podemos te ajudar hoje?",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -1580,
+        -20
+      ],
+      "id": "390807ac-7d4b-4ddd-9132-32acb25140f6",
+      "name": "When chat message received",
+      "webhookId": "7292cbd6-9749-468b-aa1c-a6f9314024ff"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "7ae9b499-ce2b-4577-80a9-7d2ae5b49b97",
+              "name": "sessionId",
+              "value": "={{ $json.sessionId }}",
+              "type": "string"
+            },
+            {
+              "id": "75fdf2b7-60f7-4cfb-a143-af14cfe04d8b",
+              "name": "prompt",
+              "value": "={{ $json.prompt }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -920,
+        -20
+      ],
+      "id": "9d03d427-a1a8-4772-b945-dcc527af7b68",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.prompt }}",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -600,
+        -20
+      ],
+      "id": "a6af0bc3-a410-4ab3-8de7-4ca5b7585827",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryPostgresChat",
+      "typeVersion": 1.3,
+      "position": [
+        -540,
+        300
+      ],
+      "id": "ec861ccf-31af-49f5-ab77-e50fdafc5187",
+      "name": "Postgres Chat Memory",
+      "credentials": {
+        "postgres": {
+          "id": "NXid5ujbeD2Mxehl",
+          "name": "AI Agent BD - Analise NFe"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolName": "consultarDadosNFe",
+        "toolDescription": "use a tool como base de dados para responder todos os questionamentos do usuário referente as NFes presente na base de dados.",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.2,
+      "position": [
+        -360,
+        300
+      ],
+      "id": "5ab1bf5d-dca0-42cb-b856-f4b12291248b",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ZlsWiM3nCDw0uGid",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -340,
+        460
+      ],
+      "id": "03ccfb91-bd1e-41ea-95cc-ee86b479ee4f",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "mrw2lhLvSxQM8kj7",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://drive.google.com/uc?export=download&id=16hM3w2_F0nZk3g-I065w7M8g0yxFtzF2",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file",
+              "outputPropertyName": "fileZip"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -1920,
+        800
+      ],
+      "id": "4c7bf17d-11a6-410f-968b-3aa7aeefc4ea",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "fileZip",
+        "outputPrefix": "file_unzipped"
+      },
+      "type": "n8n-nodes-base.compression",
+      "typeVersion": 1.1,
+      "position": [
+        -1680,
+        800
+      ],
+      "id": "f9c50b17-34b9-48c5-b043-4314a5c1128d",
+      "name": "Decompress1",
+      "notesInFlow": true
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "file_unzipped0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -1380,
+        700
+      ],
+      "id": "15b4411f-f23d-439e-8089-774cf97740e5",
+      "name": "Extract from File3"
+    },
+    {
+      "parameters": {
+        "binaryPropertyName": "file_unzipped1",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1,
+      "position": [
+        -1380,
+        900
+      ],
+      "id": "93dc07eb-9fa0-4418-8726-eb2c41b17574",
+      "name": "Extract from File4"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -1120,
+        800
+      ],
+      "id": "38dd59db-e4a0-408f-a36d-6b830e7c1a7f",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2480,
+        800
+      ],
+      "id": "5b34e7ea-c46d-4bb0-b4ac-ee0d0e63bfab",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "const cabecalhos = $(\"Extract from File3\").all().map(item => item.json);\nconst itens = $(\"Extract from File4\").all().map(item => item.json);\n\nconst documentosFormatados = [];\n\n// 1. Criar um mapa dos itens para busca rápida\nconst itensMap = new Map();\nfor (const item of itens) {\n  const idNota = item['CHAVE DE ACESSO']; \n  if (!itensMap.has(idNota)) {\n    itensMap.set(idNota, []);\n  }\n  itensMap.get(idNota).push(item);\n}\n\n$('Extract from File3').first().json['RAZÃO SOCIAL EMITENTE']\n// 2. Iterar sobre os cabeçalhos para criar um documento por NF\nfor (const cabecalho of cabecalhos) {\n  const idNota = cabecalho['CHAVE DE ACESSO'];\n  const itensDaNF = itensMap.get(idNota) || [];\n  \n  // Formatar o texto da NF completa (cabeçalho + itens)\n  const textoDaNFCompleta = `\n    Chave Nota Fiscal: ${idNota}\n    Numero: ${cabecalho['NÚMERO']}\n    Modelo: ${cabecalho['MODELO']}\n    Série: ${cabecalho['SÉRIE']}\n    Natureza da Operação: ${cabecalho['NATUREZA DA OPERAÇÃO']}\n    Data de Emissão: ${cabecalho['DATA EMISSÃO']}\n    Evento Mais Recente: ${cabecalho['EVENTO MAIS RECENTE']}\n    Data/Hora do Evento Mais Recente: ${cabecalho['DATA/HORA EVENTO MAIS RECENTE']}\n    CPF/CNPJ do Emitente: ${cabecalho['CPF/CNPJ Emitente']}\n    Razão Social do Emitente: ${cabecalho['RAZÃO SOCIAL EMITENTE']}\n    Inscrição Estadual do Emitente: ${cabecalho['INSCRIÇÃO ESTADUAL EMITENTE']}\n    UF do Emitente: ${cabecalho['UF EMITENTE']}\n    Município do Emitente: ${cabecalho['MUNICÍPIO EMITENTE']}\n    CNPJ do Destinatário: ${cabecalho['CNPJ DESTINATÁRIO']}\n    Nome do Destinatário: ${cabecalho['NOME DESTINATÁRIO']}\n    UF do Destinatário: ${cabecalho['UF DESTINATÁRIO']}\n    Indicador IE do Destinatário: ${cabecalho['INDICADOR IE DESTINATÁRIO']}\n    Destino da Operação: ${cabecalho['DESTINO DA OPERAÇÃO']}\n    Consumidor Final: ${cabecalho['CONSUMIDOR FINAL']}\n    Presença do Comprador: ${cabecalho['PRESENÇA DO COMPRADOR']}\n    Valor da Nota Fiscal: ${cabecalho['VALOR NOTA FISCAL']}\n    \n    Itens:\n    ${itensDaNF.map(it => `\n    - Item Número: ${it['NÚMERO PRODUTO']}\n      Descrição: ${it['DESCRIÇÃO DO PRODUTO/SERVIÇO']}\n      Codigo NCM/SH: ${it['CÓDIGO NCM/SH']}\n      Tipo de Produto: ${it['NCM/SH (TIPO DE PRODUTO)']}\n      CFOP: ${it['CFOP']}\n      Quantidade: ${it['QUANTIDADE']} ${it['UNIDADE']}\n      Valor Unitário: R$ ${it['VALOR UNITÁRIO']}\n      Valor Total do Item: R$ ${it['VALOR TOTAL']}`\n    ).join('\\n')}\n  `;\n  \n  // Adicionar o documento e os metadados à lista de saída\n  documentosFormatados.push({\n    json: {\n      texto_para_embedding: textoDaNFCompleta,\n      metadata_chave_nf: idNota\n    }\n  });\n}\n\nreturn {\n    documentosFormatados\n};\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -740,
+        800
+      ],
+      "id": "689b15aa-5c52-4581-966a-a1464d33436f",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "documents",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "id",
+              "condition": "neq",
+              "keyValue": "0"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -2200,
+        800
+      ],
+      "id": "0b3dd3d1-3170-4197-81be-3466457882d4",
+      "name": "Supabase2",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "ZlsWiM3nCDw0uGid",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.2,
+      "position": [
+        -280,
+        800
+      ],
+      "id": "54e1b378-66f0-48d8-9c77-a7cbf65901a8",
+      "name": "Supabase Vector Store2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "ZlsWiM3nCDw0uGid",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -500,
+        1000
+      ],
+      "id": "73655ebe-af7e-41e4-9af2-01b2f6b16fc7",
+      "name": "Embeddings OpenAI2",
+      "credentials": {
+        "openAiApi": {
+          "id": "mrw2lhLvSxQM8kj7",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $('Code1').item.json.documentosFormatados }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        1000
+      ],
+      "id": "b24f2478-5cdf-426e-aa79-4ba940285544",
+      "name": "Default Data Loader1"
+    },
+    {
+      "parameters": {
+        "chunkSize": 2000,
+        "chunkOverlap": 200,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        1180
+      ],
+      "id": "a9d55766-06c1-43d0-89f6-e9ab73555c2b",
+      "name": "Recursive Character Text Splitter1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Loop over input items and add a new field called 'myNewField' to the JSON of each one\nconst sessionId = $input.first().json.sessionId\nconst inputMessage = $input.first().json.chatInput\n\nconst prompt = `Você é um analista de dados especialista em Notas Fiscais. O usuário fez a seguinte pergunta: \"${inputMessage}\".\n\nA sua resposta DEVE ser um objeto JSON.\n\nPara responder, utilize os dados das Notas Fiscais que estão estruturados da seguinte forma:\n\n---\n**Dados do Cabeçalho das Notas Fiscais:**\nEste dataset contém informações gerais de cada nota fiscal. Os campos disponíveis são: 'Chave Nota Fiscal', 'Numero', 'Modelo', 'Série', 'Natureza da Operação', 'Data de Emissão', 'Evento Mais Recente', 'Data/Hora do Evento Mais Recente', 'CPF/CNPJ do Emitente', 'Razão Social do Emitente', 'Inscrição Estadual do Emitente', 'UF do Emitente', 'Município do Emitente', 'CNPJ do Destinatário', 'Nome do Destinatário', 'UF do Destinatário', 'Indicador IE do Destinatário', 'Destino da Operação', 'Consumidor Final', 'Presença do Comprador', e 'Valor da Nota Fiscal'.\n---\n\n---\n**Dados dos Itens das Notas Fiscais:**\nEste dataset contém os detalhes dos itens de cada nota. O campo 'Chave Nota Fiscal' pode ser usado para correlacionar itens com seus respectivos cabeçalhos. Os campos disponíveis para cada item são: 'Item Número', 'Descrição', 'Codigo NCM/SH', 'Tipo de Produto', 'CFOP', 'Quantidade', 'Unidade', 'Valor Unitário', e 'Valor Total do Item'.\n---\n\nAnalise a pergunta do usuário e retorne a resposta de forma concisa e direta, utilizando as informações disponíveis. Se a pergunta não puder ser respondida com os dados fornecidos, indique isso na sua resposta JSON.`;\n\nreturn {sessionId, prompt};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -1240,
+        -20
+      ],
+      "id": "4d4c41d9-e0fd-402f-8595-216f0ccea454",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -720,
+        220
+      ],
+      "id": "a0d4c601-9c17-40b7-9819-fd3b0ab5711e",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "mrw2lhLvSxQM8kj7",
+          "name": "OpenAi account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Postgres Chat Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Decompress1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Decompress1": {
+      "main": [
+        [
+          {
+            "node": "Extract from File3",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Extract from File4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File3": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File4": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Supabase2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase2": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI2": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader1": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store2",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter1": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader1",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "24b2f299-3740-4c08-82e0-cb22566a5a19",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d8e7d517e5010d3a6a436e5c39361d3e1726f8a39f4a08a38fbd371c64578d0c"
+  },
+  "id": "3S7cRNTnnX12yQQ4",
+  "tags": []
+}
