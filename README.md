@@ -13,7 +13,7 @@ Criação do agente de consultas
 É criado um agente utilizando LangChain que permite consultar a base de dados SQLite de forma interativa, facilitando a extração de informações necessárias para o processamento. -> agent.py
 
 Processamento dos dados
-Com os dados carregados, o agente é utilizado para organizar e filtrar as informações conforme as regras definidas no enunciado, preparando os dados para a geração da planilha final. -> processing.py
+Com os dados carregados, o agente é utilizado para consultar a base. Em seguida, os dados são organizados, agregados e filtrados de acordo com as regras definidas no enunciado. -> processing.py
 
 Geração da planilha final
 Por fim, os dados processados são consolidados e exportados para um arquivo de saída, gerando a planilha VR MENSAL 05.2025 com os valores correspondentes a cada funcionário. -> processing.py 
