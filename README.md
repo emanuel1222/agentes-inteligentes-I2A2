@@ -34,14 +34,11 @@ Por fim, os dados processados são consolidados e exportados para um arquivo de 
 └── README.md
 ````
 
-bash
-Copy code
-
 ## Como Rodar
 
 1. Crie e ative um ambiente virtual:
 
-```bash
+```` bash
 python -m venv .venv
 
 source .venv/bin/activate   # Linux/Mac
@@ -51,13 +48,13 @@ source .venv/bin/activate   # Linux/Mac
 
 2. Instale as dependências:
 
-````
+```` bash
 pip install -r requirements.txt
 ````
 
 3. Crie um arquivo .env na raiz do projeto com sua chave da API do Google:
 
-````
+```` 
 GOOGLE_API_KEY=sua_chave_aqui
 ````
 
