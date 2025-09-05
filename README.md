@@ -61,9 +61,7 @@ pip install -r requirements.txt
 GOOGLE_API_KEY=sua_chave_aqui
 ````
 
-4. Coloque o arquivo desafio-4.zip dentro da pasta data/.
-
-5. Execute o projeto:
+4. Execute o projeto:
 
 ````
 python -m src.main
