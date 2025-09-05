@@ -3,6 +3,21 @@
 Este projeto processa planilhas contidas em um arquivo ZIP, carrega os dados em um banco SQLite, 
 faz consultas usando um LLM (Google Gemini via LangChain) e gera uma planilha final com os valores de VR para cada funcionário.
 
+# Como a solução foi construida
+A aplicação foi estruturada em quatro etapas principais:
+
+Carregamento dos dados (LOAD)
+Os arquivos ZIP são extraídos e os dados contidos nas planilhas são carregados em um banco de dados SQLite. -> extractor.py.
+
+Criação do agente de consultas
+É criado um agente utilizando LangChain que permite consultar a base de dados SQLite de forma interativa, facilitando a extração de informações necessárias para o processamento. -> agent.py
+
+Processamento dos dados
+Com os dados carregados, o agente é utilizado para organizar e filtrar as informações conforme as regras definidas no enunciado, preparando os dados para a geração da planilha final. -> processing.py
+
+Geração da planilha final
+Por fim, os dados processados são consolidados e exportados para um arquivo de saída, gerando a planilha VR MENSAL 05.2025 com os valores correspondentes a cada funcionário. -> processing.py 
+
 ## Estrutura de Pastas
 ````
 meu_projeto_vr/
