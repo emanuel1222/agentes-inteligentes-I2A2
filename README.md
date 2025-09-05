@@ -20,7 +20,7 @@ Por fim, os dados processados são consolidados e exportados para um arquivo de 
 
 ## Estrutura de Pastas
 ````
-meu_projeto_vr/
+
 ├── data/
 │ └── desafio-4.zip
 ├── src/
