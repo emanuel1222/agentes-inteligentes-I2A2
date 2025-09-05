@@ -1,46 +1,55 @@
-# agentes-inteligentes-I2A2
-Repositório do grupo Agentes de Turing, sobre o curso de Agentes Inteligentes idealizado pela I2A2
+# Projeto VR Mensal
 
-## Descrição da tarefa
-![alt text](description.png)
+Este projeto processa planilhas contidas em um arquivo ZIP, carrega os dados em um banco SQLite, 
+faz consultas usando um LLM (Google Gemini via LangChain) e gera uma planilha final com os valores de VR para cada funcionário.
 
-# Chat com Banco de Dados usando Gemini e LangChain
+## Estrutura de Pastas
+````
+meu_projeto_vr/
+├── data/
+│ └── desafio-4.zip
+├── src/
+│ ├── config.py
+│ ├── database.py
+│ ├── extractor.py
+│ ├── agent.py
+│ ├── processing.py
+│ └── main.py
+├── requirements.txt
+└── README.md
+````
 
-Este projeto permite que você converse com seus dados (de arquivos CSV e Excel) usando linguagem natural. Ele usa o modelo Gemini do Google para entender suas perguntas, buscar as informações no banco de dados e te dar uma resposta.
+bash
+Copy code
 
-## Como Funciona
+## Como Rodar
 
-1.  **Carrega Dados:**
-    *   Pega arquivos `.csv` e `.xlsx` de dentro de um arquivo `.zip`.
-    *   Salva esses dados em um banco de dados SQLite local. Cada arquivo/planilha vira uma tabela.
-2.  **Entende sua Pergunta:**
-    *   Você faz uma pergunta como "Quantas vendas tivemos em janeiro?".
-    *   O modelo Gemini (via LangChain) traduz sua pergunta para uma consulta SQL.
-3.  **Busca e Responde:**
-    *   A consulta SQL é executada no banco de dados.
-    *   O resultado é usado para gerar uma resposta clara para você.
+1. Crie e ative um ambiente virtual:
 
-## Para Começar
+```bash
+python -m venv .venv
 
-1.  **Instale o necessário:**
-    ```bash
-    pip install pandas sqlalchemy langchain-google-genai langchain-experimental python-dotenv
-    ```
+source .venv/bin/activate   # Linux/Mac
 
-2.  **Sua Chave Google Gemini:**
-    *   Crie um arquivo chamado `.env` na pasta do projeto.
-    *   Dentro dele, coloque: `GOOGLE_API_KEY="SUA_CHAVE_API_AQUI"`
-    *   (Não envie este arquivo para o Git! Adicione `.env` ao seu `.gitignore`.)
+.venv\Scripts\activate      # Windows
+````
 
-3.  **Seus Dados:**
-    *   Coloque seus arquivos `.csv` ou `.xlsx` dentro de um arquivo ZIP.
-    *   No script Python, ajuste `zip_path` para o caminho do seu ZIP.
+2. Instale as dependências:
 
-4.  **Rode o Script:**
-    ```bash
-    python chat_gui.py
-    ```
+````
+pip install -r requirements.txt
+````
 
-## Ref
+3. Crie um arquivo .env na raiz do projeto com sua chave da API do Google:
 
-[Exemplo](https://colab.research.google.com/github/sudarshan-koirala/youtube-stuffs/blob/main/langchain/sql_chain.ipynb#scrollTo=ec47a2bf)
+````
+GOOGLE_API_KEY=sua_chave_aqui
+````
+
+4. Coloque o arquivo desafio-4.zip dentro da pasta data/.
+
+5. Execute o projeto:
+
+````
+python -m src.main
+````

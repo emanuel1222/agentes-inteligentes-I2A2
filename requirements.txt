@@ -1,0 +1,7 @@
+pandas
+sqlalchemy
+python-dotenv
+langchain
+langchain-google-genai
+langchain-experimental
+openpyxl
