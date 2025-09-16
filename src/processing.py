@@ -76,9 +76,9 @@ def obter_listas_auxiliares(agent):
     ferias_dict = {matricula: dias for matricula, dias in ferias_list}
     afastamentos_dict = dict(ast.literal_eval(agent.invoke("SELECT MATRICULA, `Unnamed: 3` FROM AFASTAMENTOS_Planilha1")['result']))
     admitidos_dict = {
-        matricula: pd.to_datetime(data_admissao).day
+        matricula: pd.to_datetime(data_admissao)
         for matricula, data_admissao in ast.literal_eval(agent.invoke(
-            "SELECT MATRICULA, `Admissão` FROM ADMISSÃO_ABRIL_Planilha1 WHERE `Unnamed: 3` NOT LIKE '%não recebe VR'"
+            "Selecione a matricula e a data de admissão para todos os funcionarios admitidos em abril"
         )['result'])
     }
 
@@ -101,6 +101,9 @@ def calcular_vr(agent, sind_dict, listas_auxiliares, competencia="05/2025"):
     resultado = []
 
     matriculas_a_excluir = set(listas_auxiliares["estagio"] + listas_auxiliares["aprendiz"] + listas_auxiliares["exterior"] + list(listas_auxiliares["afastamentos"].keys()))
+    
+    inicio_periodo = pd.to_datetime("2025-04-15")
+    fim_periodo = pd.to_datetime("2025-05-15")
 
     for funcionario in func_ativos_list:
         matricula, cod, cargo, status, sindicato = funcionario
@@ -122,11 +125,16 @@ def calcular_vr(agent, sind_dict, listas_auxiliares, competencia="05/2025"):
             # Regra de admissão
             if matricula in listas_auxiliares["admitidos"]:
                 dia_admissao = listas_auxiliares["admitidos"][matricula]
-                if dia_admissao > 15:
-                    dias_a_pagar = dias_uteis - (dia_admissao - 15)
+                
+            #calcular dias que o funcionario trabalhou apos admissao
+                if dia_admissao > inicio_periodo:
+                    periodo_raw = (fim_periodo - dia_admissao).days;
+                    dias_uteis_aprox = periodo_raw - (periodo_raw // 7) * 2 # aprox, considera 2 dias de descanso a cada 7 dias
+                    dias_a_pagar = dias_uteis - (dias_uteis_aprox)
                 else:
                     dias_a_pagar = dias_uteis
             else:
+                dia_admissao = pd.to_datetime('2025/4/1')
                 dias_ferias = listas_auxiliares["ferias"].get(matricula, 0)
                 dias_a_pagar = dias_uteis - dias_ferias
 
@@ -135,17 +143,21 @@ def calcular_vr(agent, sind_dict, listas_auxiliares, competencia="05/2025"):
 
             resultado.append({
                 "matricula": matricula,
+                "Admissão": dia_admissao,
                 "Sindicato do Colaborador": sindicato,
                 "Competência": competencia,
                 "Dias": dias_a_pagar,
                 "VALOR DIÁRIO VR": valor_diario,
                 "VALOR TOTAL VR": valor_total,
+                "Custo empresa": valor_total* 0.8,
+                "Desconto profissional": valor_total* 0.2,
                 "OBS GERAL": ""
             })
 
-    return pd.DataFrame(resultado, columns=["matricula", "Sindicato do Colaborador", "Competência", "Dias", "VALOR DIÁRIO VR", "VALOR TOTAL VR", "OBS GERAL"])
+    return pd.DataFrame(resultado, columns=["matricula", "Admissão", "Sindicato do Colaborador", "Competência", "Dias", "VALOR DIÁRIO VR", "VALOR TOTAL VR", "Custo empresa", "Desconto profissional",  "OBS GERAL"])
 
 
 def salvar_resultado(df, output_filename="VR MENSAL 05.2025.xlsx"):
+    print(df[['matricula', 'Admissão', 'Dias']].head())
     df.to_excel(output_filename, index=False)
     print(f"Resultado salvo em {output_filename}")
