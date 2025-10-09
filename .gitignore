@@ -1,0 +1,41 @@
+
+# Ambientes virtuais
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Arquivos temporários
+*.log
+*.tmp
+*.temp
+*.bak
+*.swp
+*.DS_Store
+
+# Pasta tempo_data
+temp_data/
+
+# Configurações locais
+.idea/
+.vscode/
+*.sqlite3
+
+# Arquivos de build
+build/
+dist/
+*.egg-info/
+
+# Arquivos de teste temporários
+.coverage
+pytest_cache/
+
+# Arquivos de sistema
+Thumbs.db
